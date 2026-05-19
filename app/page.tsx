@@ -258,7 +258,7 @@ export default function VelouraStudio() {
 
           <Reveal delay={400}>
             <div className="flex gap-10">
-              {[["10+","Projects"],["3+","Years Exp."],["100%","Satisfaction"]].map(([num, label]) => (
+              {[["50+","Projects"],["3+","Years Exp."],["100%","Satisfaction"]].map(([num, label]) => (
                 <div key={label}>
                   <div className="font-['Syne'] text-2xl sm:text-3xl font-bold text-[#C8A7FF]">{num}</div>
                   <div className="text-[9px] tracking-[0.2em] text-white/30 uppercase mt-1">{label}</div>
