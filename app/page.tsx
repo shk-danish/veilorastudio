@@ -172,23 +172,51 @@ export default function VelouraStudio() {
         }
         .drawer-open { animation: drawerIn 0.25s ease forwards; }
 
-        /* Hero title — fluid across all breakpoints */
+        /* ── HERO TITLE ── */
         .hero-title-block {
           font-family: 'Syne', sans-serif;
           font-weight: 800;
           letter-spacing: -0.02em;
-          line-height: 1.0;
-          /* clamp: min 26px, scales with viewport, max 64px */
-          font-size: clamp(26px, 7vw, 64px);
+          line-height: 1.05;
+          font-size: clamp(22px, 6.5vw, 64px);
         }
 
-        /* UNFORGETTABLE — always slightly smaller so it never overflows */
+        /*
+          UNFORGETTABLE — its own block so it wraps safely.
+          Slightly smaller clamp so on narrow screens it
+          never overflows. word-break breaks mid-word only
+          as a last resort.
+        */
         .hero-unforgettable {
+          display: block;
           color: #C8A7FF;
           font-style: italic;
-          /* starts at 20px on tiny screens, grows but stays 88% of parent */
-          font-size: clamp(20px, 5.8vw, 64px);
-          display: inline;
+          font-family: 'Syne', sans-serif;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          line-height: 1.05;
+          font-size: clamp(20px, 5.5vw, 64px);
+          word-break: break-word;
+          overflow-wrap: anywhere;
+        }
+
+        /*
+          CTA heading — LET'S BUILD / SOMETHING GREAT.
+          Two separate spans, each display:block,
+          so they never fight for space on one line.
+        */
+        .cta-title {
+          font-family: 'Syne', sans-serif;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          line-height: 1.0;
+          font-size: clamp(28px, 7.5vw, 64px);
+        }
+        .cta-accent {
+          display: block;
+          color: #C8A7FF;
+          font-style: italic;
+          font-size: clamp(22px, 6vw, 64px);
           word-break: break-word;
           overflow-wrap: anywhere;
         }
@@ -196,10 +224,7 @@ export default function VelouraStudio() {
 
       {/* ── NAV ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#07060D]/85 backdrop-blur-xl border-b border-white/5">
-        {/* Top bar */}
         <div className="relative px-5 py-3.5 flex items-center justify-between">
-
-          {/* Left: hamburger on mobile, hidden on md+ */}
           <button
             className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/25 transition-all z-10"
             onClick={() => setMenuOpen((v) => !v)}
@@ -208,16 +233,10 @@ export default function VelouraStudio() {
             {menuOpen ? <X size={17} /> : <Menu size={17} />}
           </button>
 
-          {/* Logo — centered absolutely on mobile, left-aligned on desktop */}
-          <span className="
-            font-['Syne'] font-bold text-sm tracking-widest
-            absolute left-1/2 -translate-x-1/2
-            md:static md:left-auto md:translate-x-0
-          ">
+          <span className="font-['Syne'] font-bold text-sm tracking-widest absolute left-1/2 -translate-x-1/2 md:static md:left-auto md:translate-x-0">
             VELOURA<span className="text-[#C8A7FF]">.</span>STUDIO
           </span>
 
-          {/* Desktop: nav links */}
           <div className="hidden md:flex gap-7">
             {navLinks.map(item => (
               <a key={item} href={`#${item.toLowerCase()}`}
@@ -227,36 +246,24 @@ export default function VelouraStudio() {
             ))}
           </div>
 
-          {/* Desktop: CTA button — hidden on mobile */}
           <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
             className="hidden md:inline-flex items-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[9px] font-medium tracking-[0.16em] uppercase px-4 py-2.5 rounded-full hover:scale-105 hover:shadow-lg hover:shadow-purple-400/30 transition-all duration-200">
             Start a Project <ArrowRight size={11} />
           </a>
 
-          {/* Right spacer on mobile (mirrors hamburger width for centering logo) */}
           <div className="md:hidden w-9 flex-shrink-0" />
         </div>
 
-        {/* Mobile drawer */}
         {menuOpen && (
           <div className="drawer-open md:hidden bg-[#0C0A16]/97 backdrop-blur-2xl border-t border-white/5 px-6 py-5 flex flex-col">
             {navLinks.map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                onClick={handleNavClick}
-                className="text-[11px] tracking-[0.22em] uppercase text-white/60 hover:text-[#C8A7FF] transition-colors py-4 border-b border-white/[0.06] last:border-0"
-              >
+              <a key={item} href={`#${item.toLowerCase()}`} onClick={handleNavClick}
+                className="text-[11px] tracking-[0.22em] uppercase text-white/60 hover:text-[#C8A7FF] transition-colors py-4 border-b border-white/[0.06] last:border-0">
                 {item}
               </a>
             ))}
-            <a
-              href={WHATSAPP}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleNavClick}
-              className="mt-5 inline-flex items-center justify-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[10px] font-medium tracking-[0.16em] uppercase px-6 py-3.5 rounded-full transition-opacity hover:opacity-90"
-            >
+            <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" onClick={handleNavClick}
+              className="mt-5 inline-flex items-center justify-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[10px] font-medium tracking-[0.16em] uppercase px-6 py-3.5 rounded-full transition-opacity hover:opacity-90">
               Start a Project <ArrowRight size={12} />
             </a>
           </div>
@@ -279,9 +286,14 @@ export default function VelouraStudio() {
           </Reveal>
 
           <Reveal delay={100}>
+            {/*
+              WHERE BRANDS + BECOME on one line via hero-title-block.
+              UNFORGETTABLE. as its own display:block span below —
+              never shares a line, never clips.
+            */}
             <h1 className="hero-title-block mb-6">
               WHERE BRANDS<br />
-              BECOME{" "}
+              BECOME
               <span className="hero-unforgettable">UNFORGETTABLE.</span>
             </h1>
           </Reveal>
@@ -458,14 +470,12 @@ export default function VelouraStudio() {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              {/* Prev */}
               <button onClick={prevReview}
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-[#C8A7FF]/50 hover:bg-white/5 transition-all flex-shrink-0"
                 aria-label="Previous review">
                 <ArrowLeft size={15} />
               </button>
 
-              {/* Card */}
               <div className="flex-1 relative min-w-0">
                 <div key={currentReview} className="slide-in-right bg-white/[0.02] backdrop-blur-md border border-white/10 rounded-3xl p-6 sm:p-8 relative">
                   <Quote size={28} className="text-[#C8A7FF] mb-4" fill="currentColor" />
@@ -483,13 +493,11 @@ export default function VelouraStudio() {
                     </span>
                   </div>
                 </div>
-                {/* Progress bar */}
                 <div className="h-0.5 w-full bg-white/5 mt-4 rounded-full overflow-hidden">
                   <div className="h-full bg-[#C8A7FF] rounded-full transition-all duration-100 ease-linear" style={{ width: `${progress}%` }} />
                 </div>
               </div>
 
-              {/* Next */}
               <button onClick={nextReview}
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-[#C8A7FF]/50 hover:bg-white/5 transition-all flex-shrink-0"
                 aria-label="Next review">
@@ -497,7 +505,6 @@ export default function VelouraStudio() {
               </button>
             </div>
 
-            {/* Dots */}
             <div className="flex items-center gap-2.5">
               {reviews.map((_, idx) => (
                 <button key={idx}
@@ -522,10 +529,17 @@ export default function VelouraStudio() {
         <div className="container relative z-20 max-w-7xl mx-auto px-6 py-24 text-center">
           <Reveal>
             <span className="inline-block text-[9px] tracking-[0.18em] uppercase text-[#C8A7FF]/80 border border-[#C8A7FF]/20 rounded-full px-3 py-1 mb-5">Ready to Start?</span>
-            <h2 className="font-['Syne'] font-extrabold text-4xl sm:text-5xl md:text-6xl tracking-tight mb-5 leading-[0.95]">
-              LET'S BUILD<br />
-              <span className="text-[#C8A7FF] italic">SOMETHING GREAT.</span>
+
+            {/*
+              LET'S BUILD on its own line via cta-title.
+              SOMETHING GREAT. as cta-accent (display:block) below —
+              smaller clamp, never clips on any screen.
+            */}
+            <h2 className="cta-title mb-5">
+              LET'S BUILD
+              <span className="cta-accent">SOMETHING GREAT.</span>
             </h2>
+
             <p className="text-[10px] tracking-[0.1em] text-white/30 uppercase mb-8 max-w-sm mx-auto">
               Drop us a message — we respond within a few hours.
             </p>
@@ -559,5 +573,5 @@ export default function VelouraStudio() {
         </div>
       </footer>
     </div>
-  );
+  )
 }
