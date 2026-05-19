@@ -37,7 +37,8 @@ function useScrollReveal() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const el = entry.target;
+            // FIX: Added type casting to HTMLElement
+            const el = entry.target as HTMLElement;
             const delay = el.dataset.delay || "0";
             setTimeout(() => {
               el.classList.add("opacity-100", "!translate-y-0", "!translate-x-0");
@@ -60,7 +61,8 @@ function useScrollExit() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const el = entry.target;
+          // FIX: Added type casting to HTMLElement
+          const el = entry.target as HTMLElement;
           if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
             el.classList.add("exit-up");
           } else if (entry.isIntersecting) {
@@ -78,8 +80,8 @@ function useScrollExit() {
   }, []);
 }
 
-function Reveal({ children, delay = 0, direction = "bottom", className = "", exit = false }) {
-  const translateMap = {
+function Reveal({ children, delay = 0, direction = "bottom", className = "", exit = false }: { children: React.ReactNode, delay?: number, direction?: string, className?: string, exit?: boolean }) {
+  const translateMap: Record<string, string> = {
     left: "-translate-x-8",
     right: "translate-x-8",
     bottom: "translate-y-8",
@@ -107,7 +109,7 @@ export default function VelouraStudio() {
   const [currentReview, setCurrentReview] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const intervalRef = useRef(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const nextReview = useCallback(() => {
     setCurrentReview((prev) => (prev + 1) % reviews.length);
@@ -133,7 +135,7 @@ export default function VelouraStudio() {
 
   const handleNavClick = () => setMenuOpen(false);
 
-  const renderStars = (rating) => {
+  const renderStars = (rating: number) => {
     const stars = Math.round(rating / 2);
     return Array.from({ length: 5 }).map((_, i) => (
       <Star key={i} size={12} className={i < stars ? "fill-[#C8A7FF] text-[#C8A7FF]" : "text-white/20"} />
@@ -181,12 +183,6 @@ export default function VelouraStudio() {
           font-size: clamp(22px, 6.5vw, 64px);
         }
 
-        /*
-          UNFORGETTABLE — its own block so it wraps safely.
-          Slightly smaller clamp so on narrow screens it
-          never overflows. word-break breaks mid-word only
-          as a last resort.
-        */
         .hero-unforgettable {
           display: block;
           color: #C8A7FF;
@@ -200,11 +196,6 @@ export default function VelouraStudio() {
           overflow-wrap: anywhere;
         }
 
-        /*
-          CTA heading — LET'S BUILD / SOMETHING GREAT.
-          Two separate spans, each display:block,
-          so they never fight for space on one line.
-        */
         .cta-title {
           font-family: 'Syne', sans-serif;
           font-weight: 800;
@@ -286,11 +277,6 @@ export default function VelouraStudio() {
           </Reveal>
 
           <Reveal delay={100}>
-            {/*
-              WHERE BRANDS + BECOME on one line via hero-title-block.
-              UNFORGETTABLE. as its own display:block span below —
-              never shares a line, never clips.
-            */}
             <h1 className="hero-title-block mb-6">
               WHERE BRANDS<br />
               BECOME
@@ -530,11 +516,6 @@ export default function VelouraStudio() {
           <Reveal>
             <span className="inline-block text-[9px] tracking-[0.18em] uppercase text-[#C8A7FF]/80 border border-[#C8A7FF]/20 rounded-full px-3 py-1 mb-5">Ready to Start?</span>
 
-            {/*
-              LET'S BUILD on its own line via cta-title.
-              SOMETHING GREAT. as cta-accent (display:block) below —
-              smaller clamp, never clips on any screen.
-            */}
             <h2 className="cta-title mb-5">
               LET'S BUILD
               <span className="cta-accent">SOMETHING GREAT.</span>
