@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ArrowRight, ArrowLeft, Phone, Mail, Star, Quote } from "lucide-react";
+import { ArrowRight, ArrowLeft, Phone, Mail, Star, Quote, Menu, X } from "lucide-react";
 
 const WHATSAPP = "https://wa.me/919970803662";
 const EMAIL = "mailto:veilorastudio2006@gmail.com";
@@ -30,7 +30,6 @@ const reviews = [
   { name: "Omar T.", role: "SaaS Startup Founder", text: "From zero to a full product website in a week. Clean, fast, and exactly what we needed.", project: "Web Dev" },
 ];
 
-// Scroll reveal + exit animation hooks
 function useScrollReveal() {
   useEffect(() => {
     const els = document.querySelectorAll("[data-reveal]");
@@ -38,7 +37,7 @@ function useScrollReveal() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
+            const el = entry.target;
             const delay = el.dataset.delay || "0";
             setTimeout(() => {
               el.classList.add("opacity-100", "!translate-y-0", "!translate-x-0");
@@ -61,15 +60,13 @@ function useScrollExit() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const el = entry.target as HTMLElement;
+          const el = entry.target;
           if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
-            // Element scrolled out upwards – trigger exit animation
             el.classList.add("exit-up");
           } else if (entry.isIntersecting) {
-            // Reset for re-entry
             el.classList.remove("exit-up");
             el.style.animation = "none";
-            el.offsetHeight; // force reflow
+            el.offsetHeight;
             el.style.animation = "";
           }
         });
@@ -81,19 +78,7 @@ function useScrollExit() {
   }, []);
 }
 
-function Reveal({
-  children,
-  delay = 0,
-  direction = "bottom",
-  className = "",
-  exit = false,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  direction?: "left" | "right" | "bottom" | "top";
-  className?: string;
-  exit?: boolean;
-}) {
+function Reveal({ children, delay = 0, direction = "bottom", className = "", exit = false }) {
   const translateMap = {
     left: "-translate-x-8",
     right: "translate-x-8",
@@ -118,10 +103,11 @@ export default function VelouraStudio() {
   useScrollReveal();
   useScrollExit();
 
+  const [menuOpen, setMenuOpen] = useState(false);
   const [currentReview, setCurrentReview] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef(null);
 
   const nextReview = useCallback(() => {
     setCurrentReview((prev) => (prev + 1) % reviews.length);
@@ -133,35 +119,28 @@ export default function VelouraStudio() {
     setProgress(0);
   }, []);
 
-  // Auto‑advance with progress bar
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     if (isHovered) return;
-
     intervalRef.current = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 100) {
-          nextReview();
-          return 0;
-        }
+        if (prev >= 100) { nextReview(); return 0; }
         return prev + 2;
       });
     }, 100);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isHovered, currentReview, nextReview]);
 
-  const renderStars = (rating: number) => {
+  const handleNavClick = () => setMenuOpen(false);
+
+  const renderStars = (rating) => {
     const stars = Math.round(rating / 2);
     return Array.from({ length: 5 }).map((_, i) => (
-      <Star
-        key={i}
-        size={12}
-        className={i < stars ? "fill-[#C8A7FF] text-[#C8A7FF]" : "text-white/20"}
-      />
+      <Star key={i} size={12} className={i < stars ? "fill-[#C8A7FF] text-[#C8A7FF]" : "text-white/20"} />
     ));
   };
+
+  const navLinks = ["Home", "Services", "Work", "Clients", "Contact"];
 
   return (
     <div className="bg-[#07060D] text-[#EEE9FF] font-['DM_Mono'] overflow-x-hidden">
@@ -169,55 +148,119 @@ export default function VelouraStudio() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap');
 
         @keyframes marquee {
-          0% { transform: translateX(0); }
+          0%   { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
-        .animate-marquee {
-          animation: marquee 50s linear infinite;
-        }
-        .animate-marquee:hover {
-          animation-play-state: paused;
-        }
+        .animate-marquee { animation: marquee 50s linear infinite; }
+        .animate-marquee:hover { animation-play-state: paused; }
 
         @keyframes slideInRight {
           from { opacity: 0; transform: translateX(20px); }
-          to { opacity: 1; transform: translateX(0); }
+          to   { opacity: 1; transform: translateX(0); }
         }
-        .slide-in-right {
-          animation: slideInRight 0.5s ease forwards;
-        }
+        .slide-in-right { animation: slideInRight 0.45s ease forwards; }
 
         @keyframes exitUp {
           from { opacity: 1; transform: translateY(0); }
-          to { opacity: 0; transform: translateY(-25px); }
+          to   { opacity: 0; transform: translateY(-25px); }
         }
-        .exit-up {
-          animation: exitUp 0.5s ease forwards !important;
+        .exit-up { animation: exitUp 0.5s ease forwards !important; }
+
+        @keyframes drawerIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .drawer-open { animation: drawerIn 0.25s ease forwards; }
+
+        /* Hero title — fluid across all breakpoints */
+        .hero-title-block {
+          font-family: 'Syne', sans-serif;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          line-height: 1.0;
+          /* clamp: min 26px, scales with viewport, max 64px */
+          font-size: clamp(26px, 7vw, 64px);
         }
 
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+        /* UNFORGETTABLE — always slightly smaller so it never overflows */
+        .hero-unforgettable {
+          color: #C8A7FF;
+          font-style: italic;
+          /* starts at 20px on tiny screens, grows but stays 88% of parent */
+          font-size: clamp(20px, 5.8vw, 64px);
+          display: inline;
+          word-break: break-word;
+          overflow-wrap: anywhere;
         }
       `}</style>
 
       {/* ── NAV ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-3.5 flex justify-between items-center bg-[#07060D]/80 backdrop-blur-xl border-b border-white/5">
-        <span className="font-['Syne'] font-bold text-sm tracking-widest flex-shrink-0">
-          VELOURA<span className="text-[#C8A7FF]">.</span>STUDIO
-        </span>
-        <div className="hidden md:flex gap-7">
-          {["Home","Services","Work","Clients","Contact"].map(item => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="text-[10px] tracking-[0.16em] uppercase text-white/50 hover:text-[#C8A7FF] transition-colors">{item}</a>
-          ))}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#07060D]/85 backdrop-blur-xl border-b border-white/5">
+        {/* Top bar */}
+        <div className="relative px-5 py-3.5 flex items-center justify-between">
+
+          {/* Left: hamburger on mobile, hidden on md+ */}
+          <button
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/25 transition-all z-10"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <X size={17} /> : <Menu size={17} />}
+          </button>
+
+          {/* Logo — centered absolutely on mobile, left-aligned on desktop */}
+          <span className="
+            font-['Syne'] font-bold text-sm tracking-widest
+            absolute left-1/2 -translate-x-1/2
+            md:static md:left-auto md:translate-x-0
+          ">
+            VELOURA<span className="text-[#C8A7FF]">.</span>STUDIO
+          </span>
+
+          {/* Desktop: nav links */}
+          <div className="hidden md:flex gap-7">
+            {navLinks.map(item => (
+              <a key={item} href={`#${item.toLowerCase()}`}
+                className="text-[10px] tracking-[0.16em] uppercase text-white/50 hover:text-[#C8A7FF] transition-colors">
+                {item}
+              </a>
+            ))}
+          </div>
+
+          {/* Desktop: CTA button — hidden on mobile */}
+          <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
+            className="hidden md:inline-flex items-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[9px] font-medium tracking-[0.16em] uppercase px-4 py-2.5 rounded-full hover:scale-105 hover:shadow-lg hover:shadow-purple-400/30 transition-all duration-200">
+            Start a Project <ArrowRight size={11} />
+          </a>
+
+          {/* Right spacer on mobile (mirrors hamburger width for centering logo) */}
+          <div className="md:hidden w-9 flex-shrink-0" />
         </div>
-        <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
-           className="inline-flex items-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[9px] font-medium tracking-[0.16em] uppercase px-4 py-2.5 rounded-full hover:scale-105 hover:shadow-lg hover:shadow-purple-400/30 transition-all duration-200">
-          Start a Project <ArrowRight size={11} />
-        </a>
+
+        {/* Mobile drawer */}
+        {menuOpen && (
+          <div className="drawer-open md:hidden bg-[#0C0A16]/97 backdrop-blur-2xl border-t border-white/5 px-6 py-5 flex flex-col">
+            {navLinks.map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                onClick={handleNavClick}
+                className="text-[11px] tracking-[0.22em] uppercase text-white/60 hover:text-[#C8A7FF] transition-colors py-4 border-b border-white/[0.06] last:border-0"
+              >
+                {item}
+              </a>
+            ))}
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleNavClick}
+              className="mt-5 inline-flex items-center justify-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[10px] font-medium tracking-[0.16em] uppercase px-6 py-3.5 rounded-full transition-opacity hover:opacity-90"
+            >
+              Start a Project <ArrowRight size={12} />
+            </a>
+          </div>
+        )}
       </nav>
 
       {/* ── HERO ── */}
@@ -230,13 +273,16 @@ export default function VelouraStudio() {
 
         <div className="container relative z-20 w-full max-w-7xl mx-auto px-6 pt-12 pb-20">
           <Reveal delay={0}>
-            <span className="inline-block text-[9px] tracking-[0.18em] uppercase text-[#C8A7FF]/80 border border-[#C8A7FF]/20 rounded-full px-3 py-1 mb-5">Creative Studio · Est. 2024</span>
+            <span className="inline-block text-[9px] tracking-[0.18em] uppercase text-[#C8A7FF]/80 border border-[#C8A7FF]/20 rounded-full px-3 py-1 mb-5">
+              Creative Studio · Est. 2024
+            </span>
           </Reveal>
 
           <Reveal delay={100}>
-            <h1 className="font-['Syne'] font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight mb-6 break-words">
-              WHERE BRANDS<br />BECOME{" "}
-              <span className="text-[#C8A7FF] italic">UNFORGETTABLE.</span>
+            <h1 className="hero-title-block mb-6">
+              WHERE BRANDS<br />
+              BECOME{" "}
+              <span className="hero-unforgettable">UNFORGETTABLE.</span>
             </h1>
           </Reveal>
 
@@ -249,10 +295,12 @@ export default function VelouraStudio() {
           <Reveal delay={300}>
             <div className="flex flex-wrap items-center gap-4 mb-16">
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
-                 className="inline-flex items-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[10px] font-medium tracking-[0.16em] uppercase px-6 py-3.5 rounded-full hover:scale-105 hover:shadow-lg hover:shadow-purple-400/30 transition-all duration-200">
+                className="inline-flex items-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[10px] font-medium tracking-[0.16em] uppercase px-6 py-3.5 rounded-full hover:scale-105 hover:shadow-lg hover:shadow-purple-400/30 transition-all duration-200">
                 Start a Project <ArrowRight size={13} />
               </a>
-              <a href="#work" className="inline-flex items-center gap-2 border border-white/15 text-white text-[10px] tracking-[0.16em] uppercase px-5 py-3 rounded-full hover:bg-white/5 transition">View Work</a>
+              <a href="#work" className="inline-flex items-center gap-2 border border-white/15 text-white text-[10px] tracking-[0.16em] uppercase px-5 py-3 rounded-full hover:bg-white/5 transition">
+                View Work
+              </a>
             </div>
           </Reveal>
 
@@ -273,7 +321,7 @@ export default function VelouraStudio() {
       <div className="border-t border-b border-white/5 py-3.5 bg-white/[0.02] overflow-hidden whitespace-nowrap">
         <div className="animate-marquee inline-flex">
           {Array(8).fill("WEB DEVELOPMENT · UI/UX DESIGN · BRAND IDENTITY · MARKETING DESIGN · SOCIAL MEDIA · VIDEO EDITING ·  ").map((t, i) => (
-            <span key={i} className="text-[10px] tracking-[0.22em] text-white/20 pr-0">{t}</span>
+            <span key={i} className="text-[10px] tracking-[0.22em] text-white/20">{t}</span>
           ))}
         </div>
       </div>
@@ -311,7 +359,7 @@ export default function VelouraStudio() {
 
       <div className="w-full h-px bg-white/5" />
 
-      {/* ── SERVICES (with exit animations on mobile) ── */}
+      {/* ── SERVICES ── */}
       <section id="services" className="relative py-24 bg-[#07060D] bg-[radial-gradient(ellipse_at_30%_30%,rgba(200,167,255,0.06)_0%,transparent_70%)]">
         <div className="container max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-end flex-wrap gap-4 mb-12">
@@ -325,7 +373,7 @@ export default function VelouraStudio() {
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="text-right group block">
                 <div className="font-['Syne'] text-xl font-bold">GET</div>
                 <div className="text-[9px] tracking-[0.2em] uppercase">A QUOTE</div>
-                <div className="h-0.5 bg-[#C8A7FF] mt-1.5 rounded-full transition-all duration-300 group-hover:w-full w-full"></div>
+                <div className="h-0.5 bg-[#C8A7FF] mt-1.5 rounded-full w-full" />
               </a>
             </Reveal>
           </div>
@@ -351,7 +399,7 @@ export default function VelouraStudio() {
                         </div>
                       </div>
                       <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
-                         className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C8A7FF] to-purple-600 flex items-center justify-center transition-transform group-hover:scale-110 flex-shrink-0">
+                        className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C8A7FF] to-purple-600 flex items-center justify-center transition-transform group-hover:scale-110 flex-shrink-0">
                         <ArrowRight size={14} className="text-[#07060D]" />
                       </a>
                     </div>
@@ -406,25 +454,22 @@ export default function VelouraStudio() {
 
           <div className="flex flex-col items-center justify-center gap-6">
             <div
-              className="flex items-center justify-center gap-4 w-full max-w-2xl"
+              className="flex items-center justify-center gap-3 sm:gap-4 w-full max-w-2xl"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <button
-                onClick={prevReview}
-                className="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-[#C8A7FF]/50 hover:bg-white/5 transition-all"
-                aria-label="Previous review"
-              >
-                <ArrowLeft size={16} />
+              {/* Prev */}
+              <button onClick={prevReview}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-[#C8A7FF]/50 hover:bg-white/5 transition-all flex-shrink-0"
+                aria-label="Previous review">
+                <ArrowLeft size={15} />
               </button>
 
-              <div className="flex-1 relative">
-                <div
-                  key={currentReview}
-                  className="slide-in-right bg-white/[0.02] backdrop-blur-md border border-white/10 rounded-3xl p-8 relative"
-                >
-                  <Quote size={32} className="text-[#C8A7FF] mb-4" fill="currentColor" />
-                  <p className="text-sm italic text-white/70 leading-relaxed mb-6 min-h-[80px]">
+              {/* Card */}
+              <div className="flex-1 relative min-w-0">
+                <div key={currentReview} className="slide-in-right bg-white/[0.02] backdrop-blur-md border border-white/10 rounded-3xl p-6 sm:p-8 relative">
+                  <Quote size={28} className="text-[#C8A7FF] mb-4" fill="currentColor" />
+                  <p className="text-sm italic text-white/70 leading-relaxed mb-6 min-h-[72px]">
                     {reviews[currentReview].text}
                   </p>
                   <div className="w-full h-px bg-white/5 mb-5" />
@@ -438,33 +483,27 @@ export default function VelouraStudio() {
                     </span>
                   </div>
                 </div>
-
+                {/* Progress bar */}
                 <div className="h-0.5 w-full bg-white/5 mt-4 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#C8A7FF] rounded-full transition-all duration-100 ease-linear"
-                    style={{ width: `${progress}%` }}
-                  />
+                  <div className="h-full bg-[#C8A7FF] rounded-full transition-all duration-100 ease-linear" style={{ width: `${progress}%` }} />
                 </div>
               </div>
 
-              <button
-                onClick={nextReview}
-                className="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-[#C8A7FF]/50 hover:bg-white/5 transition-all"
-                aria-label="Next review"
-              >
-                <ArrowRight size={16} />
+              {/* Next */}
+              <button onClick={nextReview}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-[#C8A7FF]/50 hover:bg-white/5 transition-all flex-shrink-0"
+                aria-label="Next review">
+                <ArrowRight size={15} />
               </button>
             </div>
 
+            {/* Dots */}
             <div className="flex items-center gap-2.5">
               {reviews.map((_, idx) => (
-                <button
-                  key={idx}
+                <button key={idx}
                   onClick={() => { setCurrentReview(idx); setProgress(0); }}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    idx === currentReview ? "bg-[#C8A7FF] scale-125" : "bg-white/20"
-                  }`}
-                  aria-label={`Go to review ${idx + 1}`}
+                  className={`rounded-full transition-all duration-300 ${idx === currentReview ? "bg-[#C8A7FF] w-5 h-2" : "bg-white/20 w-2 h-2"}`}
+                  aria-label={`Review ${idx + 1}`}
                 />
               ))}
             </div>
@@ -492,11 +531,11 @@ export default function VelouraStudio() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
-                 className="inline-flex items-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[10px] font-medium tracking-[0.16em] uppercase px-6 py-3.5 rounded-full hover:scale-105 hover:shadow-lg hover:shadow-purple-400/30 transition-all">
+                className="inline-flex items-center gap-2 bg-[#C8A7FF] text-[#07060D] text-[10px] font-medium tracking-[0.16em] uppercase px-6 py-3.5 rounded-full hover:scale-105 hover:shadow-lg hover:shadow-purple-400/30 transition-all">
                 <Phone size={13} /> WhatsApp Us
               </a>
               <a href={EMAIL}
-                 className="inline-flex items-center gap-2 border border-white/15 text-white text-[10px] tracking-[0.16em] uppercase px-5 py-3 rounded-full hover:bg-white/5 transition">
+                className="inline-flex items-center gap-2 border border-white/15 text-white text-[10px] tracking-[0.16em] uppercase px-5 py-3 rounded-full hover:bg-white/5 transition">
                 <Mail size={13} /> Email Us
               </a>
             </div>
@@ -506,16 +545,16 @@ export default function VelouraStudio() {
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-white/5 py-7 px-6">
-        <div className="container max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="container max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
           <span className="font-['Syne'] font-bold text-sm tracking-widest">
             VELOURA<span className="text-[#C8A7FF]">.</span>STUDIO
           </span>
           <span className="text-[9px] tracking-[0.16em] text-white/25 uppercase">© 2024 · All Rights Reserved</span>
           <div className="flex gap-5">
             <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
-               className="text-[9px] tracking-[0.16em] text-white/30 uppercase hover:text-[#C8A7FF] transition">WhatsApp</a>
+              className="text-[9px] tracking-[0.16em] text-white/30 uppercase hover:text-[#C8A7FF] transition">WhatsApp</a>
             <a href={EMAIL}
-               className="text-[9px] tracking-[0.16em] text-white/30 uppercase hover:text-[#C8A7FF] transition">Email</a>
+              className="text-[9px] tracking-[0.16em] text-white/30 uppercase hover:text-[#C8A7FF] transition">Email</a>
           </div>
         </div>
       </footer>
