@@ -573,5 +573,5 @@ export default function VelouraStudio() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
