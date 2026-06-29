@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { ArrowRight, ArrowLeft, Phone, Mail, Star, Quote, Menu, X } from "lucide-react";
 
 const WHATSAPP = "https://wa.me/919970803662";
-const EMAIL = "mailto:veilorastudio2006@gmail.com";
+const EMAIL = "mailto:captorastudio2006@gmail.com";
 
 const services = [
   { id: "01", title: "Web Development", desc: "Fast, responsive websites built with Next.js and Tailwind. From landing pages to full products.", rating: 9.4, tag: "NEXT.JS · REACT" },
